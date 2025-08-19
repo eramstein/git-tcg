@@ -11,8 +11,8 @@
 <div class="battle">
   <div class="battle__main">
     <div class="battle__side battle__side--left">
-      {#if foePlayer}
-        <Player player={foePlayer} />
+      {#if localPlayer}
+        <Player player={localPlayer} />
       {/if}
     </div>
 
@@ -21,8 +21,8 @@
     </div>
 
     <div class="battle__side battle__side--right">
-      {#if localPlayer}
-        <Player player={localPlayer} />
+      {#if foePlayer}
+        <Player player={foePlayer} />
       {/if}
     </div>
   </div>

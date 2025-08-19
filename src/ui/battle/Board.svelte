@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { bs } from '@/logic/_state/battle.svelte';
+  import { bs, LOCAL_PLAYER_ID } from '@/logic/_state/battle.svelte';
   import { dropTile } from '@/logic/battle/_actions';
-  import type { Position, Tile, TileDeployed } from '@/logic/_model';
+  import { getPossiblePositions } from '@/logic/battle/board';
+  import type { Position, Tile } from '@/logic/_model';
   import TileDeployedComponent from './TileDeployed.svelte';
 
   // Grid configuration - use CSS variable for consistency
@@ -25,51 +26,6 @@
   let draggedTile: Tile | null = $state(null);
   let possiblePositions: Position[] = $state([]);
 
-  // Get all possible positions where a tile can be dropped
-  function getPossiblePositions(): Position[] {
-    if (bs.tiles.length === 0) {
-      // First tile can only be placed at center
-      return [{ x: 0, y: 0 }];
-    }
-
-    // Get all adjacent positions to existing tiles
-    const adjacentPositions = new Set<string>();
-
-    for (const tile of bs.tiles) {
-      const { x, y } = tile.position;
-      // Check all 4 adjacent positions
-      const adjacent = [
-        { x: x + 1, y },
-        { x: x - 1, y },
-        { x, y: y + 1 },
-        { x, y: y - 1 },
-      ];
-
-      for (const pos of adjacent) {
-        // Check if position is within board bounds
-        if (
-          pos.x >= -CENTER_OFFSET &&
-          pos.x <= CENTER_OFFSET &&
-          pos.y >= -CENTER_OFFSET &&
-          pos.y <= CENTER_OFFSET
-        ) {
-          // Check if position is not already occupied
-          const isOccupied = bs.tiles.some(
-            (t: TileDeployed) => t.position.x === pos.x && t.position.y === pos.y
-          );
-          if (!isOccupied) {
-            adjacentPositions.add(`${pos.x},${pos.y}`);
-          }
-        }
-      }
-    }
-
-    return Array.from(adjacentPositions).map((pos) => {
-      const [x, y] = pos.split(',').map(Number);
-      return { x, y };
-    });
-  }
-
   // Check if a position is a valid drop target
   function isValidDropPosition(position: Position): boolean {
     return possiblePositions.some((pos) => pos.x === position.x && pos.y === position.y);
@@ -92,7 +48,7 @@
     }
 
     // Call the dropTile action
-    dropTile(draggedTile, position);
+    dropTile(LOCAL_PLAYER_ID, draggedTile, position);
 
     // Reset drag state
     draggedTile = null;

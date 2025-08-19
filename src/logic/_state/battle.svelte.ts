@@ -55,7 +55,3 @@ export const resetBattleState = (): void => {
     console.error('Failed to reset battle state:', error);
   }
 };
-
-export const getCurrentBattleState = () => {
-  return JSON.parse(JSON.stringify({ ...bs }));
-};
