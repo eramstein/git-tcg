@@ -30,3 +30,6 @@ chroma
 
 # Generated files
 src/data/_all_cards.json
+
+# Server state files
+data/

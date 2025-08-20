@@ -1,10 +1,5 @@
-import {
-  loadGameStateFromLocalStorage,
-  saveStateToLocalStorage,
-  resetBattleState,
-} from '@/server/storage';
-import { bs } from '@/ui/ui-state.svelte';
-import { state } from '@/server/server';
+import { bs, ui } from '@/ui/ui-state.svelte';
+import { loadGameStateFromServer, saveStateToServer, resetBattleState } from '@/ui/battle/actions';
 
 export function handleKeybinds(event: KeyboardEvent) {
   // Skip keybinds if user is typing in an input field
@@ -21,15 +16,15 @@ export function handleKeybinds(event: KeyboardEvent) {
 
   if (event.key === 'F4') {
     event.preventDefault();
-    const loadedState = loadGameStateFromLocalStorage();
-    console.log('State reloaded from localStorage', loadedState);
+    loadGameStateFromServer();
   } else if (event.key === 'F5') {
     event.preventDefault();
-    saveStateToLocalStorage();
-    console.log('State saved to localStorage');
+    saveStateToServer();
   } else if (event.key === 'r') {
     event.preventDefault();
     resetBattleState();
-    console.log('Battle state reset');
+  } else if (event.key === ' ') {
+    event.preventDefault();
+    ui.localPlayerId = 1 - ui.localPlayerId;
   }
 }

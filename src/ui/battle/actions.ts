@@ -3,29 +3,8 @@ Mocks sending actions to server.
 */
 
 import { UiHintType, type Position, type Tile } from '@/logic/_model';
-import { handleAction } from '@/server/server';
 import { bs } from '@/ui/ui-state.svelte';
-import { playAiTurn } from './ai';
 import { soundManager } from '@/ui/sound';
-
-export function dropTile(playerId: number, tile: Tile, position: Position) {
-  const newState = handleAction({ type: 'playTile', tile, position }, playerId);
-  // normally the new state would come from the websocket server
-  Object.assign(bs, newState);
-  playActionsFeedback();
-  // for mock PoC, simulate other player
-  window.setTimeout(() => {
-    const aiActions = playAiTurn();
-    if (aiActions) {
-      const stateAfterAi = handleAction(
-        { type: 'playTile', tile: aiActions.tile, position: aiActions.position },
-        1 - playerId
-      );
-      Object.assign(bs, stateAfterAi);
-      playActionsFeedback();
-    }
-  }, 1000);
-}
 
 // Audio and visual feedback for actions
 function playActionsFeedback() {
@@ -55,16 +34,63 @@ function playActionsFeedback() {
   });
 }
 
-// TODO: Setup WebSocket client: listen to updates from server
-// ----------------------------------------------------
-// const ws = new WebSocket("ws://localhost:8080");
+const ws = new WebSocket('ws://localhost:8080');
 
-// // Listen for updates from server
-// ws.addEventListener("message", (event) => {
-//   const msg = JSON.parse(event.data);
+ws.addEventListener('open', () => {
+  console.log('Connected to server ✅');
+});
 
-//   if (msg.type === "state") {
-//     gameState.set(msg.state);
-//     log.set(msg.log);
-//   }
-// });
+// Listen for updates from server
+ws.addEventListener('message', (event) => {
+  const msg = JSON.parse(event.data);
+  console.log('Received message:', msg);
+  if (msg.type === 'state') {
+    Object.assign(bs, msg.state);
+    playActionsFeedback();
+    // for mock PoC, simulate other player
+    // window.setTimeout(() => {
+    //   const aiActions = playAiTurn();
+    //   if (aiActions) {
+    //     dropTile(1 - msg.state.activePlayerId, aiActions.tile, aiActions.position);
+    //   }
+    // }, 1000);
+  }
+});
+
+export function dropTile(playerId: number, tile: Tile, position: Position) {
+  ws.send(
+    JSON.stringify({
+      type: 'action',
+      playerId,
+      payload: { type: 'playTile', tile, position },
+    })
+  );
+}
+
+// Server-side storage functions via WebSocket
+export function loadGameStateFromServer() {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'loadState' }));
+    console.log('Requested state load from server');
+  } else {
+    console.error('WebSocket not connected');
+  }
+}
+
+export function saveStateToServer() {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'saveState' }));
+    console.log('Requested state save to server');
+  } else {
+    console.error('WebSocket not connected');
+  }
+}
+
+export function resetBattleState() {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'resetState' }));
+    console.log('Requested battle state reset from server');
+  } else {
+    console.error('WebSocket not connected');
+  }
+}

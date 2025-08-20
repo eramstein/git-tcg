@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { bs, LOCAL_PLAYER_ID } from '@/ui/ui-state.svelte';
+  import { bs, ui } from '@/ui/ui-state.svelte';
   import Player from './Player.svelte';
   import Board from './Board.svelte';
   import Hand from './Hand.svelte';
 
-  let localPlayer = $derived(bs.players.find((p) => p.id === LOCAL_PLAYER_ID));
-  let foePlayer = $derived(bs.players.find((p) => p.id !== LOCAL_PLAYER_ID));
+  let localPlayer = $derived(bs.players.find((p) => p.id === ui.localPlayerId));
+  let foePlayer = $derived(bs.players.find((p) => p.id !== ui.localPlayerId));
   let victoriousPlayer = $derived(
     bs.victoriousPlayerId !== null ? bs.players.find((p) => p.id === bs.victoriousPlayerId) : null
   );

@@ -8,6 +8,13 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "server": "tsx --tsconfig tsconfig.server.json src/server/server.ts",
+    "server:build": "node esbuild.server.js",
+    "server:dev": "tsx --tsconfig tsconfig.server.json src/server/server.ts",
+    "server:watch": "tsx --tsconfig tsconfig.server.json --watch src/server/server.ts",
+    "server:start": "node dist/server.js",
+    "server:dev:watch": "tsx --tsconfig tsconfig.server.json --watch src/server/server.ts",
+    "simple-server": "tsx src/server/simple-server.ts",
     "tools:merge-cards": "node src/tools/merge-cards.js",
     "tools:convert-images": "node src/tools/convert-images.js",
     "tools:all": "npm run tools:merge-cards && npm run tools:convert-images"
@@ -15,15 +22,20 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/node": "^24.3.0",
+    "@types/ws": "^8.18.1",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.3.3",
     "svelte": "^5.28.1",
     "svelte-check": "^4.1.6",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.4",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.2",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.3",
+    "ws": "^8.18.3"
   }
 }

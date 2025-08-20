@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { bs, LOCAL_PLAYER_ID } from '@/ui/ui-state.svelte';
+  import { bs, ui } from '@/ui/ui-state.svelte';
   import { dropTile } from '@/ui/battle/actions';
   import { getPossiblePositions } from '@/logic/battle/board';
   import type { Position, Tile } from '@/logic/_model';
@@ -55,7 +55,7 @@
     }
 
     // Call the dropTile action
-    dropTile(LOCAL_PLAYER_ID, draggedTile, position);
+    dropTile(ui.localPlayerId, draggedTile, position);
 
     // Reset drag state
     draggedTile = null;
@@ -197,10 +197,10 @@
 
   // Function to get background color based on tile owner
   function getTileBackgroundColor(ownerId: number): string {
-    if (ownerId === LOCAL_PLAYER_ID) {
-      return '#000000'; // Black for local player
+    if (ownerId === 0) {
+      return '#000000'; // Black for 1st player
     } else {
-      return '#FFFFFF'; // White for opponent
+      return '#FFFFFF'; // White for 2nd player
     }
   }
 
@@ -242,7 +242,7 @@
             class="tile-background"
             style="background-color: {getTileBackgroundColor(tile.ownerId)}"
           >
-            <TileDeployedComponent {tile} localPlayerId={LOCAL_PLAYER_ID} />
+            <TileDeployedComponent {tile} localPlayerId={ui.localPlayerId} />
           </div>
         </div>
       {/each}
