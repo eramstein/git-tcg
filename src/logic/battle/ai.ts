@@ -36,5 +36,7 @@ export function playAiTurn() {
   console.log('AI playing tile:', selectedTile, 'at position:', selectedPosition);
 
   // Play the tile at the selected position
-  playTile(selectedTile, selectedPosition);
+  setTimeout(() => {
+    playTile(selectedTile, selectedPosition);
+  }, 500);
 }

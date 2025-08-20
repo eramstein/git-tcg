@@ -18,7 +18,6 @@ export const initBattle = async () => {
       score: 0,
       hand: [],
       deck: PLAYER_TILES().map((tile) => ({ ...tile, ownerId: 0, id: crypto.randomUUID() })),
-      graveyard: [],
     },
     {
       id: 1,
@@ -26,7 +25,6 @@ export const initBattle = async () => {
       score: 0,
       hand: [],
       deck: FOE_TILES().map((tile) => ({ ...tile, ownerId: 1, id: crypto.randomUUID() })),
-      graveyard: [],
     },
   ];
   bs.tiles = [];

@@ -3,21 +3,29 @@
   import { dropTile } from '@/logic/battle/_actions';
   import { getPossiblePositions } from '@/logic/battle/board';
   import type { Position, Tile } from '@/logic/_model';
+  import { soundManager } from '../sound';
   import TileDeployedComponent from './TileDeployed.svelte';
+  import { cubicOut } from 'svelte/easing';
 
-  // Grid configuration - use CSS variable for consistency
-  const CELL_SIZE = 100; // Match the --tile-size CSS variable
+  // Grid configuration - logical cell size includes a 1px gap around a 130px tile
+  const CELL_SIZE = 131; // 130px tile + 1px gap
 
   // Large underlying board size
   const BOARD_SIZE = 50; // 50x50 grid
   const CENTER_OFFSET = Math.floor(BOARD_SIZE / 2);
 
   // Camera/viewport state - start camera centered on the board
-  let cameraX = $state(-2500);
-  let cameraY = $state(-2500);
+  let cameraX = $state(-3275);
+  let cameraY = $state(-3275);
   let isDragging = $state(false);
   let lastMouseX = $state(0);
   let lastMouseY = $state(0);
+
+  // Visual zoom state (purely visual via CSS transform on the grid)
+  let zoom = $state(1);
+  const MIN_ZOOM = 0.5;
+  const MAX_ZOOM = 2.5;
+  const ZOOM_STEP = 0.1;
 
   // Viewport reference for measuring
   let viewportElement: HTMLDivElement | undefined;
@@ -55,7 +63,7 @@
     possiblePositions = [];
   }
 
-  // Convert grid position to CSS position with camera offset
+  // Convert grid position to CSS position with camera offset (positions are in world units; zoom is visual only)
   function getCellStyle(x: number, y: number) {
     // Convert grid coordinates to absolute board coordinates
     const boardX = (x + CENTER_OFFSET) * CELL_SIZE;
@@ -84,8 +92,9 @@
       const deltaX = event.clientX - lastMouseX;
       const deltaY = event.clientY - lastMouseY;
 
-      cameraX += deltaX;
-      cameraY += deltaY;
+      // Adjust for current zoom so panning matches cursor movement
+      cameraX += deltaX / zoom;
+      cameraY += deltaY / zoom;
 
       lastMouseX = event.clientX;
       lastMouseY = event.clientY;
@@ -95,6 +104,29 @@
 
   function handleMouseUp() {
     isDragging = false;
+  }
+
+  // Mouse wheel zoom handler (visual scaling around cursor)
+  function handleWheel(event: WheelEvent) {
+    event.preventDefault();
+    if (!viewportElement) return;
+
+    const rect = viewportElement.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const direction = Math.sign(event.deltaY); // 1 = zoom out, -1 = zoom in (on most systems)
+    const targetZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * (1 - direction * ZOOM_STEP)));
+    if (targetZoom === zoom) return;
+
+    // World coords under cursor before zoom
+    const worldX = mouseX / zoom - cameraX;
+    const worldY = mouseY / zoom - cameraY;
+
+    // Update zoom and adjust camera so the point under cursor stays pinned
+    zoom = targetZoom;
+    cameraX = mouseX / zoom - worldX;
+    cameraY = mouseY / zoom - worldY;
   }
 
   // Listen for drag events from Hand component
@@ -141,8 +173,8 @@
         const viewportHeight = rect.height;
 
         // Center the camera: offset by half the viewport size
-        cameraX = -2500 + viewportWidth / 2 - CELL_SIZE / 2;
-        cameraY = -2500 + viewportHeight / 2 - CELL_SIZE;
+        cameraX = -3275 + viewportWidth / 2 - CELL_SIZE / 2;
+        cameraY = -3275 + viewportHeight / 2 - CELL_SIZE;
       });
     }
   });
@@ -151,11 +183,55 @@
   $effect(() => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    if (viewportElement) {
+      viewportElement.addEventListener('wheel', handleWheel, { passive: false });
+    }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      if (viewportElement) {
+        viewportElement.removeEventListener('wheel', handleWheel as EventListener);
+      }
     };
+  });
+
+  // Function to get background color based on tile owner
+  function getTileBackgroundColor(ownerId: number): string {
+    if (ownerId === LOCAL_PLAYER_ID) {
+      return '#000000'; // Black for local player
+    } else {
+      return '#FFFFFF'; // White for opponent
+    }
+  }
+
+  // Custom animation function for tile drop effect
+  function dropAnimation(node: Element, params: { delay?: number } = {}) {
+    return {
+      delay: params.delay || 0,
+      duration: 400,
+      easing: cubicOut,
+      css: (t: number) => {
+        const y = -(1 - t) * 40; // Start from above (-40px) and move to 0
+        const scale = 0.9 + 0.1 * t; // More subtle scale: 90% to 100%
+        const opacity = t;
+        return `
+          transform: translateY(${y}px) scale(${scale});
+          opacity: ${opacity};
+        `;
+      },
+    };
+  }
+
+  // Watch for new tiles being added to the board and play sound
+  let previousTileCount = $state(bs.tiles.length);
+  $effect(() => {
+    const currentTileCount = bs.tiles.length;
+    if (currentTileCount > previousTileCount) {
+      // A new tile was added to the board
+      soundManager.playDeploySound();
+    }
+    previousTileCount = currentTileCount;
   });
 </script>
 
@@ -166,11 +242,20 @@
     onmousedown={handleMouseDown}
     class:dragging={isDragging}
   >
-    <div class="board-grid">
+    <div class="board-grid" style={`transform: scale(${zoom}); transform-origin: 0 0;`}>
       <!-- Render deployed tiles -->
-      {#each bs.tiles as tile}
-        <div class="deployed-tile" style={getCellStyle(tile.position.x, tile.position.y)}>
-          <TileDeployedComponent {tile} />
+      {#each bs.tiles as tile (tile.id)}
+        <div
+          class="deployed-tile"
+          style={getCellStyle(tile.position.x, tile.position.y)}
+          in:dropAnimation
+        >
+          <div
+            class="tile-background"
+            style="background-color: {getTileBackgroundColor(tile.ownerId)}"
+          >
+            <TileDeployedComponent {tile} />
+          </div>
         </div>
       {/each}
 
@@ -210,6 +295,7 @@
     border: 2px solid #333;
     border-radius: 8px;
     position: relative;
+    background: #3b3b3b; /* Gray board background */
   }
 
   .board-viewport.dragging {
@@ -218,21 +304,31 @@
 
   .board-grid {
     position: absolute;
-    width: 5000px; /* 50 * 100px */
-    height: 5000px; /* 50 * 100px */
+    width: 6550px; /* 50 * 131px */
+    height: 6550px; /* 50 * 131px */
     background: transparent;
   }
 
   .deployed-tile {
     position: absolute;
-    width: var(--tile-size);
-    height: var(--tile-size);
+    width: 131px; /* logical cell: tile + 1px gap */
+    height: 131px; /* logical cell: tile + 1px gap */
+  }
+
+  .tile-background {
+    width: 130px; /* visual tile */
+    height: 130px; /* visual tile */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    box-sizing: border-box;
   }
 
   .drop-position {
     position: absolute;
-    width: var(--tile-size);
-    height: var(--tile-size);
+    width: 130px;
+    height: 130px;
     border: 2px dashed #00aa00;
     background: rgba(0, 255, 0, 0.1);
     animation: pulse 1s infinite;

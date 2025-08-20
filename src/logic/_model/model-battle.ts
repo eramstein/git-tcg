@@ -12,7 +12,6 @@ export interface Player {
   score: number;
   hand: Tile[];
   deck: Tile[];
-  graveyard: Tile[];
 }
 
 export interface TileTemplate {

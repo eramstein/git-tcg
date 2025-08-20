@@ -6,14 +6,6 @@
   let deckCount = $derived(player.deck?.length ?? 0);
   let deckImageSrc = $derived(`/src/assets/images/card_back.jpg`);
   let portraitSrc = $derived(`/src/assets/images/characters/${player.name}.jpg`);
-
-  let lastGraveTile = $derived(
-    player.graveyard?.length ? player.graveyard[player.graveyard.length - 1] : null
-  );
-  let hasGraveTile = $derived(!!lastGraveTile);
-  let lastGraveImageSrc = $derived(
-    hasGraveTile ? `/src/assets/images/tiles/${lastGraveTile.templateId}.jpg` : ''
-  );
 </script>
 
 <div class="player">
@@ -32,14 +24,6 @@
         <img class="deck__image" src={deckImageSrc} alt="Deck" />
         <div class="deck__count">{deckCount}</div>
       </div>
-    </div>
-
-    <div class="zone zone--graveyard">
-      {#if hasGraveTile}
-        <img class="graveyard__image" src={lastGraveImageSrc} alt={lastGraveTile.name} />
-      {:else}
-        <div class="graveyard__empty"></div>
-      {/if}
     </div>
   </div>
 </div>
@@ -92,8 +76,7 @@
     align-items: center;
   }
 
-  .zone--deck,
-  .zone--graveyard {
+  .zone--deck {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -121,18 +104,5 @@
     padding: 2px 6px;
     border-radius: 10px;
     font-size: 0.8rem;
-  }
-
-  .graveyard__image {
-    width: 100px;
-    height: auto;
-    object-fit: contain;
-  }
-
-  .graveyard__empty {
-    width: 100px;
-    height: 100px;
-    border: 2px dotted #aaaaaa;
-    border-radius: 8px;
   }
 </style>
