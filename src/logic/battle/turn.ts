@@ -14,11 +14,14 @@ export function nextTurn(bs: BattleState) {
     bs.victoriousPlayerId = playerWithHighestScore.id;
     return;
   }
+  endPlayerTurn(bs, bs.activePlayerId);
   bs.turn++;
   bs.activePlayerId = bs.activePlayerId === bs.players[0].id ? bs.players[1].id : bs.players[0].id;
   initPlayerTurn(bs, bs.activePlayerId);
 }
 
-function initPlayerTurn(bs: BattleState, playerId: number) {
+function initPlayerTurn(bs: BattleState, playerId: number) {}
+
+function endPlayerTurn(bs: BattleState, playerId: number) {
   drawTile(bs, playerId);
 }

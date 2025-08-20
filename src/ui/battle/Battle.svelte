@@ -52,7 +52,7 @@
     display: grid;
     grid-template-rows: 1fr;
     gap: 1rem;
-    height: 100vh;
+    height: calc(100vh - 2rem);
     padding: 1rem;
     box-sizing: border-box;
     position: relative;
