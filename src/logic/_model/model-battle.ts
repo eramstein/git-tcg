@@ -1,9 +1,12 @@
+import type { UiHintType } from './enums';
+
 export interface BattleState {
   turn: number;
   activePlayerId: number;
   victoriousPlayerId: number | null;
   players: Player[];
   tiles: TileDeployed[];
+  uiHints: UiHint[];
 }
 
 export interface Player {
@@ -17,6 +20,8 @@ export interface Player {
 export interface TileTemplate {
   templateId: string;
   name: string;
+  power: number;
+  maxHealth: number;
 }
 
 export interface Tile extends TileTemplate {
@@ -26,9 +31,16 @@ export interface Tile extends TileTemplate {
 
 export interface TileDeployed extends Tile {
   position: Position;
+  destroyed: boolean;
+  health: number;
 }
 
 export interface Position {
   x: number;
   y: number;
+}
+
+export interface UiHint {
+  type: UiHintType;
+  args: any;
 }

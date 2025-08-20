@@ -1,9 +1,8 @@
-import { bs } from '../_state';
-import { nextTurn } from './turn';
-import { getPossiblePositions } from './board';
-import { playTile } from './tile';
+import { bs } from '@/ui/ui-state.svelte';
+import { getPossiblePositions } from '@/logic/battle/board';
+import type { Position, Tile } from '@/logic/_model';
 
-export function playAiTurn() {
+export function playAiTurn(): { tile: Tile; position: Position } | null {
   console.log('playAiTurn', bs.turn, bs.activePlayerId);
 
   // Get the current AI player
@@ -12,18 +11,11 @@ export function playAiTurn() {
   // Check if AI player has tiles in hand
   if (!aiPlayer || aiPlayer.hand.length === 0) {
     console.log('AI player has no tiles to play');
-    nextTurn();
-    return;
+    return null;
   }
 
   // Get all possible positions where a tile can be placed
-  const possiblePositions = getPossiblePositions();
-
-  if (possiblePositions.length === 0) {
-    console.log('No valid positions to place tile');
-    nextTurn();
-    return;
-  }
+  const possiblePositions = getPossiblePositions(bs);
 
   // Randomly select a tile from AI player's hand
   const randomTileIndex = Math.floor(Math.random() * aiPlayer.hand.length);
@@ -36,7 +28,5 @@ export function playAiTurn() {
   console.log('AI playing tile:', selectedTile, 'at position:', selectedPosition);
 
   // Play the tile at the selected position
-  setTimeout(() => {
-    playTile(selectedTile, selectedPosition);
-  }, 500);
+  return { tile: selectedTile, position: selectedPosition };
 }

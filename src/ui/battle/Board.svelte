@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { bs, LOCAL_PLAYER_ID } from '@/logic/_state/battle.svelte';
-  import { dropTile } from '@/logic/battle/_actions';
+  import { bs, LOCAL_PLAYER_ID } from '@/ui/ui-state.svelte';
+  import { dropTile } from '@/ui/battle/actions';
   import { getPossiblePositions } from '@/logic/battle/board';
   import type { Position, Tile } from '@/logic/_model';
-  import { soundManager } from '../sound';
   import TileDeployedComponent from './TileDeployed.svelte';
   import { cubicOut } from 'svelte/easing';
 
@@ -140,7 +139,7 @@
           try {
             draggedTile = JSON.parse(tileData);
             // Compute possible positions when drag starts
-            possiblePositions = getPossiblePositions();
+            possiblePositions = getPossiblePositions(bs);
           } catch (error) {
             console.error('Failed to parse dragged tile data:', error);
           }
@@ -222,17 +221,6 @@
       },
     };
   }
-
-  // Watch for new tiles being added to the board and play sound
-  let previousTileCount = $state(bs.tiles.length);
-  $effect(() => {
-    const currentTileCount = bs.tiles.length;
-    if (currentTileCount > previousTileCount) {
-      // A new tile was added to the board
-      soundManager.playDeploySound();
-    }
-    previousTileCount = currentTileCount;
-  });
 </script>
 
 <div class="board-container">
@@ -254,7 +242,7 @@
             class="tile-background"
             style="background-color: {getTileBackgroundColor(tile.ownerId)}"
           >
-            <TileDeployedComponent {tile} />
+            <TileDeployedComponent {tile} localPlayerId={LOCAL_PLAYER_ID} />
           </div>
         </div>
       {/each}

@@ -1,4 +1,6 @@
 {
   "templateId": "wolf",
-  "name": "Wolf"
+  "name": "Wolf",
+  "power": 1,
+  "maxHealth": 3
 }

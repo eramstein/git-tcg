@@ -2,7 +2,9 @@ import {
   loadGameStateFromLocalStorage,
   saveStateToLocalStorage,
   resetBattleState,
-} from '@/logic/_state';
+} from '@/server/storage';
+import { bs } from '@/ui/ui-state.svelte';
+import { state } from '@/server/server';
 
 export function handleKeybinds(event: KeyboardEvent) {
   // Skip keybinds if user is typing in an input field

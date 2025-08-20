@@ -1,8 +1,17 @@
-import { bs } from '@/logic/_state';
 import { FOE_TILES, loadGameData, PLAYER_TILES } from '@/data';
 import { drawTile } from './player';
+import type { BattleState } from '../_model';
 
-export const initBattle = async () => {
+export const defaultBattleState: BattleState = {
+  turn: 0,
+  activePlayerId: 0,
+  victoriousPlayerId: null,
+  players: [],
+  tiles: [],
+  uiHints: [],
+};
+
+export const initBattle = async (bs: BattleState) => {
   console.log('initBattle - loading game data...');
 
   // Wait for game data to load before proceeding
@@ -31,7 +40,7 @@ export const initBattle = async () => {
 
   for (let playerId = 0; playerId < bs.players.length; playerId++) {
     for (let i = 0; i < 5; i++) {
-      drawTile(playerId);
+      drawTile(bs, playerId);
     }
   }
 

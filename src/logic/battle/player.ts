@@ -1,6 +1,6 @@
-import { bs } from '@/logic/_state';
+import type { BattleState } from '../_model';
 
-export function drawTile(playerId: number) {
+export function drawTile(bs: BattleState, playerId: number) {
   const player = bs.players[playerId];
   const tile = player.deck.shift();
   if (tile) {
