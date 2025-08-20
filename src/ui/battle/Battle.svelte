@@ -13,6 +13,9 @@
     <div class="battle__side battle__side--left">
       {#if localPlayer}
         <Player player={localPlayer} />
+        <div class="battle__hand">
+          <Hand player={localPlayer} vertical={true} />
+        </div>
       {/if}
     </div>
 
@@ -23,23 +26,20 @@
     <div class="battle__side battle__side--right">
       {#if foePlayer}
         <Player player={foePlayer} />
+        <div class="battle__hand">
+          <Hand player={foePlayer} vertical={true} faceDown={true} />
+        </div>
       {/if}
     </div>
-  </div>
-
-  <div class="battle__hand">
-    {#if localPlayer}
-      <Hand player={localPlayer} />
-    {/if}
   </div>
 </div>
 
 <style>
   .battle {
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr;
     gap: 1rem;
-    min-height: 100vh;
+    height: 100vh;
     padding: 1rem;
     box-sizing: border-box;
   }
@@ -49,6 +49,7 @@
     grid-template-columns: 240px 1fr 240px;
     gap: 1rem;
     align-items: start;
+    height: 100%;
   }
 
   .battle__board {
@@ -58,7 +59,16 @@
     height: 100%;
   }
 
+  .battle__side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    overflow: hidden;
+  }
+
   .battle__hand {
-    padding-top: 0.5rem;
+    flex: 1;
+    overflow: auto;
   }
 </style>

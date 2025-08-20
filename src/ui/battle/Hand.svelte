@@ -2,7 +2,11 @@
   import Tile from './Tile.svelte';
   import type { Player, Tile as TileType } from '@/logic/_model';
 
-  let { player } = $props<{ player: Player }>();
+  let {
+    player,
+    vertical = false,
+    faceDown = false,
+  } = $props<{ player: Player; vertical?: boolean; faceDown?: boolean }>();
   let tilesInHand = $derived(player.hand);
   let hasNoCards = $derived(tilesInHand.length === 0);
 
@@ -15,13 +19,23 @@
   }
 </script>
 
-<div class="hand">
+<div class="hand" class:hand--vertical={vertical}>
   {#if hasNoCards}
     <div class="hand__empty">No cards in hand</div>
   {:else}
     {#each tilesInHand as tile (tile.id)}
-      <div class="hand__tile" draggable="true" ondragstart={(e) => handleDragStart(e, tile)}>
-        <Tile {tile} />
+      <div
+        class="hand__tile"
+        draggable={!faceDown}
+        ondragstart={!faceDown ? (e) => handleDragStart(e, tile) : undefined}
+      >
+        {#if faceDown}
+          <div class="tile-back">
+            <img class="tile-back__image" src="/src/assets/images/card_back.jpg" alt="Card Back" />
+          </div>
+        {:else}
+          <Tile {tile} />
+        {/if}
       </div>
     {/each}
   {/if}
@@ -38,14 +52,41 @@
     overflow-x: auto;
   }
 
+  .hand--vertical {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   .hand__tile {
     flex: 0 0 auto;
-    width: 120px;
     cursor: grab;
+    width: 120px;
+    height: 120px;
   }
+
+  /* In vertical layout, tiles keep their intrinsic width and are centered via align-items */
 
   .hand__tile:active {
     cursor: grabbing;
+  }
+
+  .tile-back {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tile-back__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
   }
 
   .hand__empty {

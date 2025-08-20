@@ -329,7 +329,7 @@
     position: absolute;
     width: 130px;
     height: 130px;
-    border: 2px dashed #00aa00;
+    outline: 1px dashed #00aa00;
     background: rgba(0, 255, 0, 0.1);
     animation: pulse 1s infinite;
     cursor: pointer;
