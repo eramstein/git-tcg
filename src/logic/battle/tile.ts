@@ -4,6 +4,7 @@ import { nextTurn } from './turn';
 import { executeAttacks } from './combat';
 
 export function playTile(bs: BattleState, tile: Tile, position: Position) {
+  bs.uiHints.push({ type: UiHintType.playTile, args: { tile, position } });
   const player = bs.players[tile.ownerId];
   player.hand.splice(player.hand.indexOf(tile), 1);
   const deployedTile: TileDeployed = {
@@ -15,7 +16,6 @@ export function playTile(bs: BattleState, tile: Tile, position: Position) {
   };
   bs.tiles.push(deployedTile);
   executeAttacks(bs, deployedTile);
-  bs.uiHints.push({ type: UiHintType.playTile, args: { tile, position } });
   nextTurn(bs);
 }
 
@@ -25,17 +25,17 @@ export function damageTile(
   amount: number,
   source?: TileDeployed
 ) {
+  bs.uiHints.push({ type: UiHintType.damageTile, args: { tile, amount, source } });
   tile.health -= amount;
-  bs.uiHints.push({ type: UiHintType.attackTile, args: { tile, amount, source } });
   if (tile.health <= 0) {
     destroyTile(bs, tile, source);
   }
 }
 
 export function destroyTile(bs: BattleState, tile: TileDeployed, source?: TileDeployed) {
+  bs.uiHints.push({ type: UiHintType.destroyTile, args: { tile, source } });
   tile.destroyed = true;
   if (source) {
     bs.players[source.ownerId].score += 1;
   }
-  bs.uiHints.push({ type: UiHintType.destroyTile, args: { tile, source } });
 }

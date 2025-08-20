@@ -1,6 +1,7 @@
 <script lang="ts">
   import Tile from './Tile.svelte';
   import type { Player, Tile as TileType } from '@/logic/_model';
+  import { bs } from '@/ui/ui-state.svelte';
 
   let {
     player,
@@ -9,6 +10,8 @@
   } = $props<{ player: Player; vertical?: boolean; faceDown?: boolean }>();
   let tilesInHand = $derived(player.hand);
   let hasNoCards = $derived(tilesInHand.length === 0);
+  let isPlayerActive = $derived(bs.activePlayerId === player.id);
+  let canDrag = $derived(!faceDown && isPlayerActive);
 
   // Handle drag start
   function handleDragStart(event: DragEvent, tile: TileType) {
@@ -26,8 +29,9 @@
     {#each tilesInHand as tile (tile.id)}
       <div
         class="hand__tile"
-        draggable={!faceDown}
-        ondragstart={!faceDown ? (e) => handleDragStart(e, tile) : undefined}
+        class:hand__tile--inactive={!isPlayerActive}
+        draggable={canDrag}
+        ondragstart={canDrag ? (e) => handleDragStart(e, tile) : undefined}
       >
         {#if faceDown}
           <div class="tile-back">
@@ -65,12 +69,22 @@
     cursor: grab;
     width: 120px;
     height: 120px;
+    transition: opacity 0.3s ease;
+  }
+
+  .hand__tile--inactive {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   /* In vertical layout, tiles keep their intrinsic width and are centered via align-items */
 
   .hand__tile:active {
     cursor: grabbing;
+  }
+
+  .hand__tile--inactive:active {
+    cursor: not-allowed;
   }
 
   .tile-back {

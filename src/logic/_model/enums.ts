@@ -1,5 +1,5 @@
 export enum UiHintType {
   playTile = 'playTile',
-  attackTile = 'attackTile',
+  damageTile = 'damageTile',
   destroyTile = 'destroyTile',
 }

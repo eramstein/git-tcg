@@ -11,6 +11,7 @@ class SoundManager {
       'karate-chop': '/src/assets/sounds/karate-chop.mp3',
       'power-punch': '/src/assets/sounds/power-punch.mp3',
       'drop-tile': '/src/assets/sounds/jumpland.mp3',
+      'destroy-tile': '/src/assets/sounds/power-punch.mp3',
     };
 
     for (const [name, path] of Object.entries(soundFiles)) {
@@ -41,6 +42,10 @@ class SoundManager {
 
   playDeploySound() {
     this.playSound('drop-tile');
+  }
+
+  playDestroySound() {
+    this.playSound('destroy-tile');
   }
 }
 

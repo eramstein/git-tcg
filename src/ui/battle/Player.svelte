@@ -1,14 +1,16 @@
 <script lang="ts">
   import type { Player } from '@/logic/_model';
+  import { bs } from '@/ui/ui-state.svelte';
 
   let { player } = $props<{ player: Player }>();
 
   let deckCount = $derived(player.deck?.length ?? 0);
   let portraitSrc = $derived(`/src/assets/images/characters/${player.name}.jpg`);
+  let isActive = $derived(bs.activePlayerId === player.id);
 </script>
 
 <div class="player">
-  <div class="player__portrait">
+  <div class="player__portrait" class:player__portrait--active={isActive}>
     <img class="portrait__image" src={portraitSrc} alt={player.name} />
   </div>
   <div class="player__score">{player.score}</div>
@@ -29,6 +31,13 @@
     height: 80px;
     border-radius: 50%;
     overflow: hidden;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .player__portrait--active {
+    border-color: var(--color-golden);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
   }
 
   .portrait__image {
