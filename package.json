@@ -12,7 +12,7 @@
     "server:build": "node esbuild.server.js",
     "server:dev": "tsx --tsconfig tsconfig.server.json src/server/server.ts",
     "server:watch": "tsx --tsconfig tsconfig.server.json --watch src/server/server.ts",
-    "server:start": "node dist/server.js",
+    "server:start": "node dist/server/server.js",
     "server:dev:watch": "tsx --tsconfig tsconfig.server.json --watch src/server/server.ts",
     "simple-server": "tsx src/server/simple-server.ts",
     "tools:merge-cards": "node src/tools/merge-cards.js",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/dotenv": "^6.1.1",
     "@types/node": "^24.3.0",
     "@types/ws": "^8.18.1",
     "prettier": "^3.5.3",
@@ -35,6 +36,7 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.2",
+    "dotenv": "^16.6.1",
     "sharp": "^0.34.3",
     "ws": "^8.18.3"
   }

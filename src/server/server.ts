@@ -3,12 +3,17 @@
   It's used to test the client-side logic without relying on a real server.
 */
 import { WebSocketServer } from 'ws';
+import dotenv from 'dotenv';
+dotenv.config();
 import type { BattleState } from '../logic/_model';
 import { defaultBattleState, initBattle } from '../logic/battle/init';
 import { loadGameStateFromLocalStorage, saveStateToLocalStorage } from './storage';
 import { playTile } from '../logic/battle/tile';
 
 export let state: BattleState = { ...defaultBattleState };
+
+const PORT = Number(process.env.PORT) || 8080;
+const HOST = process.env.HOST || '0.0.0.0';
 
 function handleAction(action: any, playerId: number): BattleState {
   state.uiHints = [];
@@ -26,7 +31,8 @@ function handleAction(action: any, playerId: number): BattleState {
   return state;
 }
 
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: PORT, host: HOST });
+console.log(`WebSocket server listening on ws://${HOST}:${PORT}`);
 
 wss.on('connection', async (ws) => {
   console.log('Client connected');

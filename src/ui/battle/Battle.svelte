@@ -128,19 +128,4 @@
     margin: 0 0 2rem 0;
     font-weight: 500;
   }
-
-  .victory-modal__button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .victory-modal__button:hover {
-    background-color: #2980b9;
-  }
 </style>

@@ -9,7 +9,7 @@ const context = await esbuild.context({
   bundle: true,
   platform: 'node',
   target: 'node18',
-  outfile: 'dist/server.js',
+  outfile: 'dist/server/server.js',
   external: [
     'ws',
     'fs',

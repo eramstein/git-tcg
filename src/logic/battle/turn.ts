@@ -2,7 +2,6 @@ import type { BattleState } from '../_model';
 import { drawTile } from './player';
 
 export function nextTurn(bs: BattleState) {
-  console.log('next turn', bs.turn, bs.activePlayerId);
   const totalTilesLeft = bs.players.reduce(
     (acc, player) => acc + player.hand.length + player.deck.length,
     0
